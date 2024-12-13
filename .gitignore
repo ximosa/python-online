@@ -1,0 +1,15 @@
+# Credenciales y archivos sensibles
+google_credentials.json
+.env
+
+# Archivos temporales
+*.pyc
+__pycache__/
+*.mp3
+*.mp4
+*.epub
+temp_*
+
+# Entorno virtual
+venv/
+env/
