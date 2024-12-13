@@ -8,11 +8,13 @@ from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoCli
 
 logging.basicConfig(level=logging.INFO)
 
-# Configurar credenciales
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"]
-)
-client = texttospeech.TextToSpeechClient(credentials=credentials)
+# Create temporary credentials file
+temp_file = "temp_credentials.json"
+with open(temp_file, "w") as f:
+    json.dump(st.secrets.gcp_service_account, f)
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = temp_file
+
 
 VOCES_DISPONIBLES = {
     'es-ES-Journey-D': texttospeech.SsmlVoiceGender.MALE,
