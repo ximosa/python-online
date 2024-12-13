@@ -1,12 +1,18 @@
 import os
-from google.cloud import texttospeech
-from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoClip, concatenate_videoclips
-import logging
-
-logging.basicConfig(level=logging.INFO)
-
 import streamlit as st
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets["google_credentials"]
+from google.cloud import texttospeech
+from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoClip
+
+# Crear archivo temporal de credenciales
+import json
+import tempfile
+
+credentials_json = json.loads(st.secrets["google_credentials"])
+temp_credentials = tempfile.NamedTemporaryFile(delete=False)
+with open(temp_credentials.name, 'w') as f:
+    json.dump(credentials_json, f)
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = temp_credentials.name
 
 VOCES_DISPONIBLES = {
     'es-ES-Journey-D': texttospeech.SsmlVoiceGender.MALE,
