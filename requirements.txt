@@ -8,4 +8,5 @@ tqdm==4.64.0
 proglog==0.1.10
 epub2txt
 openai
+google-generativeai
 
