@@ -1,6 +1,9 @@
 import streamlit as st
-import os
+import logging
 from simple_video_creator import create_simple_video, VOCES_DISPONIBLES
+
+logging.basicConfig(level=logging.INFO)
+
 
 st.title("Generador de Videos con Texto y Audio")
 
