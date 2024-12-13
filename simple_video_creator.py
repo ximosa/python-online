@@ -1,8 +1,12 @@
 import os
 import json
+import logging
 import tempfile
 from google.cloud import texttospeech
 from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoClip
+
+logging.basicConfig(level=logging.INFO)
+
 
 # Crear el archivo de credenciales directamente
 credentials = {
