@@ -7,11 +7,14 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Crear archivo de credenciales desde secrets
+# Convertir AttrDict a dict normal
+credentials = dict(st.secrets.gcp_service_account)
+
 with open("google_credentials.json", "w") as f:
-    json.dump(st.secrets["gcp_service_account"], f)
+    json.dump(credentials, f)
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google_credentials.json"
+
 
 VOCES_DISPONIBLES = {
     'es-ES-Journey-D': texttospeech.SsmlVoiceGender.MALE,
