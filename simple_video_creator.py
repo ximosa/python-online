@@ -8,16 +8,16 @@ from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoCli
 
 logging.basicConfig(level=logging.INFO)
 
-# Configurar credenciales directamente
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"]
-)
+# Crear cliente de Text-to-Speech con las credenciales
+def get_tts_client():
+    credentials = service_account.Credentials.from_service_account_dict(
+        st.secrets["gcp_service_account"]
+    )
+    return texttospeech.TextToSpeechClient(credentials=credentials)
 
-# Crear cliente con las credenciales
-client = texttospeech.TextToSpeechClient(credentials=credentials)
-
-
-
+# Usar el cliente en la función create_simple_video
+def create_simple_video(texto, nombre_salida="video_final.mp4", voz_seleccionada="es-ES-Standard-A"):
+    client = get_tts_client().
 
 VOCES_DISPONIBLES = {
     'es-ES-Journey-D': texttospeech.SsmlVoiceGender.MALE,
