@@ -9,9 +9,10 @@ logging.basicConfig(level=logging.INFO)
 
 # Crear el archivo de credenciales desde los secrets de Streamlit
 with open("google_credentials.json", "w") as f:
-    json.dump(st.secrets["gcp_service_account"], f)
+    json.dump(dict(st.secrets["gcp_service_account"]), f)
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google_credentials.json"
+
 
 
 VOCES_DISPONIBLES = {
