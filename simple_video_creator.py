@@ -5,7 +5,8 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google_credentials.json"
+import streamlit as st
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets["google_credentials"]
 
 VOCES_DISPONIBLES = {
     'es-ES-Journey-D': texttospeech.SsmlVoiceGender.MALE,
