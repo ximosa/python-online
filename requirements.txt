@@ -9,4 +9,6 @@ proglog==0.1.10
 epub2txt
 openai
 google-generativeai
+beautifulsoup4
+
 
