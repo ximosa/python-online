@@ -1,5 +1,11 @@
 streamlit
 google-cloud-texttospeech
-moviepy
+moviepy==1.0.3
+decorator==4.4.2
+imageio==2.9.0
+imageio-ffmpeg==0.4.5
+tqdm==4.64.0
+proglog==0.1.10
 epub2txt
 openai
+
