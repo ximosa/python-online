@@ -8,12 +8,14 @@ from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoCli
 
 logging.basicConfig(level=logging.INFO)
 
-# Crear archivo temporal de credenciales
-temp_file = "temp_credentials.json"
-with open(temp_file, "w") as f:
-    json.dump(dict(st.secrets["gcp_service_account"]), f)
+# Configurar credenciales directamente
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"]
+)
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = temp_file
+# Crear cliente con las credenciales
+client = texttospeech.TextToSpeechClient(credentials=credentials)
+
 
 
 
