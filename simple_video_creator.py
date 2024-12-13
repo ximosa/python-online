@@ -1,23 +1,18 @@
 import os
 import json
-import logging
 import streamlit as st
-from google.oauth2 import service_account
 from google.cloud import texttospeech
-from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoClip
+from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoClip, concatenate_videoclips
+import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Crear cliente de Text-to-Speech con las credenciales
-def get_tts_client():
-    credentials = service_account.Credentials.from_service_account_dict(
-        st.secrets["gcp_service_account"]
-    )
-    return texttospeech.TextToSpeechClient(credentials=credentials)
+# Crear el archivo de credenciales desde los secrets de Streamlit
+with open("google_credentials.json", "w") as f:
+    json.dump(st.secrets["gcp_service_account"], f)
 
-# Usar el cliente en la función create_simple_video
-def create_simple_video(texto, nombre_salida="video_final.mp4", voz_seleccionada="es-ES-Standard-A"):
-    client = get_tts_client().
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google_credentials.json"
+
 
 VOCES_DISPONIBLES = {
     'es-ES-Journey-D': texttospeech.SsmlVoiceGender.MALE,
