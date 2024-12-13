@@ -7,11 +7,25 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Crear el archivo de credenciales desde los secrets de Streamlit
+# Crear el archivo de credenciales con la estructura correcta
+credentials_dict = {
+    "type": "service_account",
+    "project_id": "datosblog-4095b",
+    "private_key_id": st.secrets["gcp_service_account"]["private_key_id"],
+    "private_key": st.secrets["gcp_service_account"]["private_key"],
+    "client_email": "voz-297@datosblog-4095b.iam.gserviceaccount.com",
+    "client_id": st.secrets["gcp_service_account"]["client_id"],
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": st.secrets["gcp_service_account"]["client_x509_cert_url"]
+}
+
 with open("google_credentials.json", "w") as f:
-    json.dump(dict(st.secrets["gcp_service_account"]), f)
+    json.dump(credentials_dict, f)
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google_credentials.json"
+
 
 
 
