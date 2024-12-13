@@ -1,12 +1,17 @@
 import os
+import json
+import streamlit as st
 from google.cloud import texttospeech
 from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoClip
 import logging
 
 logging.basicConfig(level=logging.INFO)
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = st.secrets.gcp_service_account
+# Crear archivo temporal de credenciales
+with open("google_credentials.json", "w") as f:
+    json.dump(st.secrets["gcp_service_account"], f)
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google_credentials.json"
 
 
 VOCES_DISPONIBLES = {
