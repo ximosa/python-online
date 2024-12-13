@@ -11,4 +11,4 @@ openai
 google-generativeai
 beautifulsoup4
 setuptools
-
+Wand
