@@ -10,5 +10,5 @@ epub2txt
 openai
 google-generativeai
 beautifulsoup4
-
+setuptools
 
