@@ -62,6 +62,7 @@ def create_text_image(text, size=(1280, 360), font_size=30, line_height=40):
         y += line_height
 
     return np.array(img)
+
 def create_simple_video(texto, nombre_salida, voz):
     archivos_temp = []
     clips_audio = []
@@ -78,13 +79,12 @@ def create_simple_video(texto, nombre_salida, voz):
         segmentos_texto = []
         segmento_actual = ""
         for frase in frases:
-          if len(segmento_actual) + len(frase) < 300: # Ajusta este valor según tu necesidad
+          if len(segmento_actual) + len(frase) < 300:
             segmento_actual += " " + frase
           else:
             segmentos_texto.append(segmento_actual.strip())
             segmento_actual = frase
         segmentos_texto.append(segmento_actual.strip())
-        
         
         for i, segmento in enumerate(segmentos_texto):
             logging.info(f"Procesando segmento {i+1} de {len(segmentos_texto)}")
@@ -99,7 +99,6 @@ def create_simple_video(texto, nombre_salida, voz):
                 audio_encoding=texttospeech.AudioEncoding.MP3
             )
             
-            
             retry_count = 0
             max_retries = 3
             
@@ -110,19 +109,17 @@ def create_simple_video(texto, nombre_salida, voz):
                     voice=voice,
                     audio_config=audio_config
                 )
-                break # Si la petición fue exitosa salimos del loop
+                break
               except Exception as e:
                   logging.error(f"Error al solicitar audio (intento {retry_count + 1}): {str(e)}")
                   if "429" in str(e):
                     retry_count +=1
-                    time.sleep(2**retry_count) #Backoff exponencial
-                    
+                    time.sleep(2**retry_count)
                   else:
-                    raise # Si no es un error 429 lo propagamos
+                    raise
             
             if retry_count > max_retries:
                 raise Exception("Maximos intentos de reintento alcanzado")
-            
             
             temp_filename = f"temp_audio_{i}.mp3"
             archivos_temp.append(temp_filename)
@@ -133,7 +130,6 @@ def create_simple_video(texto, nombre_salida, voz):
             clips_audio.append(audio_clip)
             duracion = audio_clip.duration
             
-            # Crear imagen con texto usando PIL
             text_img = create_text_image(segmento)
             txt_clip = (ImageClip(text_img)
                       .set_start(tiempo_acumulado)
@@ -144,8 +140,19 @@ def create_simple_video(texto, nombre_salida, voz):
             clips_finales.append(video_segment)
             
             tiempo_acumulado += duracion
+            time.sleep(0.2)
 
-            time.sleep(0.2) # Añado un retraso de 200 ms despues de cada peticion
+        # Añadir clip de suscripción
+        subscribe_text = "¡SUSCRÍBETE AL CANAL!\n👍 Dale like y activa la campana 🔔"
+        subscribe_img = create_text_image(subscribe_text, font_size=40)
+        duracion_subscribe = 5
+
+        subscribe_clip = (ImageClip(subscribe_img)
+                        .set_start(tiempo_acumulado)
+                        .set_duration(duracion_subscribe)
+                        .set_position('center'))
+
+        clips_finales.append(subscribe_clip)
         
         video_final = concatenate_videoclips(clips_finales, method="compose")
         
@@ -199,6 +206,7 @@ def create_simple_video(texto, nombre_salida, voz):
                 pass
         
         return False, str(e)
+
 
 
 
