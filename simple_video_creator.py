@@ -1,8 +1,3 @@
-import moviepy.config as conf
-conf.IMAGEMAGICK_BINARY = "convert"
-
-from PIL import Image
-Image.ANTIALIAS = Image.Resampling.LANCZOS
 import os
 import json
 import streamlit as st
