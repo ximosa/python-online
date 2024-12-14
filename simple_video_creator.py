@@ -35,12 +35,14 @@ VOCES_DISPONIBLES = {
 def create_text_image(text, size=(800, 200)):
     img = Image.new('RGB', size, 'black')
     draw = ImageDraw.Draw(img)
-    font = ImageFont.load_default()
+    # Aumentamos el tamaño usando una fuente TrueType
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 50)
     left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
     text_width = right - left
     text_height = bottom - top
     draw.text(((size[0]-text_width)/2, (size[1]-text_height)/2), text, font=font, fill="white")
     return np.array(img)
+
 
 
 def create_simple_video(texto, nombre_salida, voz):
