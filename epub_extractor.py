@@ -50,9 +50,9 @@ def extraer_epub(ruta_epub):
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
 
-def dividir_texto(texto, max_chars=15000):
+def dividir_texto(texto, max_chars=30000):
     logging.info(f"Dividiendo texto de {len(texto)} caracteres")
-    texto = texto[:100000]  # Limitamos el texto para un resumen más conciso
+    texto = texto[:200000]  # Aumentado para permitir más contenido
     partes = []
     
     while texto:
@@ -74,12 +74,12 @@ def generar_resumen(texto):
     modelo = genai.GenerativeModel('gemini-pro')
     
     prompt = """
-    Genera un resumen del texto en formato narrativo y fluido, como si fuera para subtítulos de video.
+    Actúa como un lector profundo y reflexivo. Escribe un resumen conciso y coherente del texto en primera persona, como si tú hubieras vivido la experiencia o reflexionado sobre los temas presentados.
     Sigue estas pautas:
-    - Escribe en párrafos continuos sin marcadores ni secciones
-    - No uses viñetas, asteriscos ni caracteres especiales
-    - No menciones capítulos, introducciones ni secciones
-    - Conecta las ideas de forma natural y fluida
+    - Evita mencionar nombres de personajes o del autor.
+    - Concentra el resumen en la experiencia general, las ideas principales, los temas y las emociones transmitidas por el texto.
+    - Utiliza un lenguaje evocador y personal, como si estuvieras compartiendo tus propias conclusiones tras una profunda reflexión.
+    - No uses nombres propios ni nombres de lugares específicos, refiérete a ellos como "un lugar", "una persona", "otro personaje", etc.
     - Usa un lenguaje claro y directo
     - Escribe como si estuvieras narrando una historia
     - Separa ideas solo con puntos y comas
@@ -88,27 +88,41 @@ def generar_resumen(texto):
     Texto a resumir:
     """
     
+    max_retries = 3
+    base_delay = 5
+    
     try:
         partes = dividir_texto(texto)
         resumenes = []
         
         for i, parte in enumerate(partes, 1):
             logging.info(f"Procesando parte {i}/{len(partes)}")
-            try:
-                respuesta = modelo.generate_content(prompt + parte)
-                resumenes.append(respuesta.text)
-                logging.info(f"Parte {i} resumida correctamente")
-                time.sleep(2)  # Pausa entre llamadas a la API
-                
-            except Exception as e:
-                logging.error(f"Error en parte {i}: {str(e)}")
-                continue
+            retry_count = 0
+            
+            while retry_count < max_retries:
+                try:
+                    respuesta = modelo.generate_content(prompt + parte)
+                    resumenes.append(respuesta.text)
+                    logging.info(f"Parte {i} resumida correctamente")
+                    time.sleep(base_delay)  # Mayor pausa entre llamadas
+                    break
+                    
+                except Exception as e:
+                    retry_count += 1
+                    wait_time = base_delay * (2 ** retry_count)  # Backoff exponencial
+                    logging.warning(f"Intento {retry_count} fallido. Esperando {wait_time} segundos...")
+                    time.sleep(wait_time)
+                    
+                    if retry_count == max_retries:
+                        logging.error(f"Error en parte {i} después de {max_retries} intentos: {str(e)}")
+                        continue
         
         return "\n\n".join(resumenes)
         
     except Exception as e:
         logging.error(f"Error en generación de resumen: {str(e)}")
         raise
+
 
 
 
