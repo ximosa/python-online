@@ -7,8 +7,8 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Configuración específica para Streamlit Cloud
-os.environ['MAGICK_HOME'] = '/usr'
+# Configuración específica para ImageMagick en Linux
+os.environ['IMAGEMAGICK_BINARY'] = '/usr/bin/convert'
 
 # Convertir secrets a diccionario y crear archivo
 credentials = dict(st.secrets.gcp_service_account)
