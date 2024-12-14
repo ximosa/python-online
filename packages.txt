@@ -1,6 +1,6 @@
-imagemagick
-libmagickwand-dev
-ghostscript
-libpango1.0-0
+python3-pil
+python3-pil.imagetk
+fonts-dejavu
+
 
 
