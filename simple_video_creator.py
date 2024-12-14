@@ -2,15 +2,14 @@ import os
 import json
 import streamlit as st
 from google.cloud import texttospeech
-from moviepy.editor import AudioFileClip, TextClip, ColorClip, CompositeVideoClip
+from moviepy.editor import AudioFileClip, ImageClip, CompositeVideoClip, concatenate_videoclips
+from PIL import Image, ImageDraw, ImageFont
+import numpy as np
 import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Configuración de ImageMagick con la nueva política
-os.environ['MAGICK_CONFIGURE_PATH'] = os.path.dirname(os.path.abspath(__file__))
-
-# Convertir secrets a diccionario y crear archivo
+# Configuración de credenciales
 credentials = dict(st.secrets.gcp_service_account)
 with open("google_credentials.json", "w") as f:
     json.dump(credentials, f)
@@ -32,6 +31,14 @@ VOCES_DISPONIBLES = {
     'es-ES-Standard-B': texttospeech.SsmlVoiceGender.MALE,
     'es-ES-Standard-C': texttospeech.SsmlVoiceGender.FEMALE
 }
+
+def create_text_image(text, size=(800, 200)):
+    img = Image.new('RGB', size, 'black')
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.load_default()
+    w, h = draw.textsize(text, font=font)
+    draw.text(((size[0]-w)/2, (size[1]-h)/2), text, font=font, fill="white")
+    return np.array(img)
 
 def create_simple_video(texto, nombre_salida, voz):
     archivos_temp = []
@@ -72,17 +79,12 @@ def create_simple_video(texto, nombre_salida, voz):
             clips_audio.append(audio_clip)
             duracion = audio_clip.duration
             
-           txt_clip = (TextClip(frase,
-                       fontsize=30,
-                       color='white',
-                       bg_color='black',
-                       size=(800, None),
-                       method='pango',  # Cambiamos a método pango
-                       align='center')
-               .set_start(tiempo_acumulado)
-               .set_duration(duracion)
-               .set_position('center'))
-
+            # Crear imagen con texto usando PIL
+            text_img = create_text_image(frase)
+            txt_clip = (ImageClip(text_img)
+                      .set_start(tiempo_acumulado)
+                      .set_duration(duracion)
+                      .set_position('center'))
             
             video_segment = txt_clip.set_audio(audio_clip.set_start(tiempo_acumulado))
             clips_finales.append(video_segment)
@@ -141,6 +143,7 @@ def create_simple_video(texto, nombre_salida, voz):
                 pass
         
         return False, str(e)
+
 
 
 
