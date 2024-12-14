@@ -1,0 +1,14 @@
+[server]
+enableXsrfProtection = false
+
+[browser]
+serverAddress = "0.0.0.0"
+serverPort = 8501
+
+[runner]
+magick_policy = """
+<policymap>
+  <policy domain="coder" rights="read|write" pattern="*" />
+  <policy domain="delegate" rights="read|write" pattern="*" />
+</policymap>
+"""
