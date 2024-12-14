@@ -7,8 +7,8 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Configuración específica para ImageMagick en Linux
-os.environ['IMAGEMAGICK_BINARY'] = '/usr/bin/convert'
+# Configuración de ImageMagick con la nueva política
+os.environ['MAGICK_CONFIGURE_PATH'] = os.path.dirname(os.path.abspath(__file__))
 
 # Convertir secrets a diccionario y crear archivo
 credentials = dict(st.secrets.gcp_service_account)
