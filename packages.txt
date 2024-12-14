@@ -1,2 +1,4 @@
 imagemagick
 libmagickwand-dev
+ghostscript
+
