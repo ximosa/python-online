@@ -6,6 +6,7 @@ from moviepy.editor import AudioFileClip, ImageClip, CompositeVideoClip, concate
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import logging
+import time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -63,11 +64,6 @@ def create_text_image(text, size=(800, 400)):
     
     return np.array(img)
 
-
-
-
-
-
 def create_simple_video(texto, nombre_salida, voz):
     archivos_temp = []
     clips_audio = []
@@ -79,10 +75,23 @@ def create_simple_video(texto, nombre_salida, voz):
         client = texttospeech.TextToSpeechClient()
         
         tiempo_acumulado = 0
-        for i, frase in enumerate(frases):
-            logging.info(f"Procesando frase {i+1} de {len(frases)}")
+        
+        # Agrupamos frases en segmentos
+        segmentos_texto = []
+        segmento_actual = ""
+        for frase in frases:
+          if len(segmento_actual) + len(frase) < 300: # Ajusta este valor según tu necesidad
+            segmento_actual += " " + frase
+          else:
+            segmentos_texto.append(segmento_actual.strip())
+            segmento_actual = frase
+        segmentos_texto.append(segmento_actual.strip())
+        
+        
+        for i, segmento in enumerate(segmentos_texto):
+            logging.info(f"Procesando segmento {i+1} de {len(segmentos_texto)}")
             
-            synthesis_input = texttospeech.SynthesisInput(text=frase)
+            synthesis_input = texttospeech.SynthesisInput(text=segmento)
             voice = texttospeech.VoiceSelectionParams(
                 language_code="es-ES",
                 name=voz,
@@ -92,11 +101,30 @@ def create_simple_video(texto, nombre_salida, voz):
                 audio_encoding=texttospeech.AudioEncoding.MP3
             )
             
-            response = client.synthesize_speech(
-                input=synthesis_input,
-                voice=voice,
-                audio_config=audio_config
-            )
+            
+            retry_count = 0
+            max_retries = 3
+            
+            while retry_count <= max_retries:
+              try:
+                response = client.synthesize_speech(
+                    input=synthesis_input,
+                    voice=voice,
+                    audio_config=audio_config
+                )
+                break # Si la petición fue exitosa salimos del loop
+              except Exception as e:
+                  logging.error(f"Error al solicitar audio (intento {retry_count + 1}): {str(e)}")
+                  if "429" in str(e):
+                    retry_count +=1
+                    time.sleep(2**retry_count) #Backoff exponencial
+                    
+                  else:
+                    raise # Si no es un error 429 lo propagamos
+            
+            if retry_count > max_retries:
+                raise Exception("Maximos intentos de reintento alcanzado")
+            
             
             temp_filename = f"temp_audio_{i}.mp3"
             archivos_temp.append(temp_filename)
@@ -108,7 +136,7 @@ def create_simple_video(texto, nombre_salida, voz):
             duracion = audio_clip.duration
             
             # Crear imagen con texto usando PIL
-            text_img = create_text_image(frase)
+            text_img = create_text_image(segmento)
             txt_clip = (ImageClip(text_img)
                       .set_start(tiempo_acumulado)
                       .set_duration(duracion)
@@ -118,6 +146,8 @@ def create_simple_video(texto, nombre_salida, voz):
             clips_finales.append(video_segment)
             
             tiempo_acumulado += duracion
+
+            time.sleep(0.2) # Añado un retraso de 200 ms despues de cada peticion
         
         video_final = concatenate_videoclips(clips_finales, method="compose")
         
