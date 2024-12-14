@@ -35,7 +35,8 @@ VOCES_DISPONIBLES = {
 def create_text_image(text, size=(800, 400)):
     img = Image.new('RGB', size, 'black')
     draw = ImageDraw.Draw(img)
-    font = ImageFont.load_default().font_variant(size=40)  # Aumentamos tamaño a 40
+    # Usamos DejaVu que tiene buen soporte para caracteres españoles
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 40)
     
     words = text.split()
     lines = []
@@ -45,13 +46,13 @@ def create_text_image(text, size=(800, 400)):
         current_line.append(word)
         test_line = ' '.join(current_line)
         left, top, right, bottom = draw.textbbox((0, 0), test_line, font=font)
-        if right > size[0] - 60:  # Más margen lateral
+        if right > size[0] - 60:
             current_line.pop()
             lines.append(' '.join(current_line))
             current_line = [word]
     lines.append(' '.join(current_line))
     
-    total_height = len(lines) * 50  # Aumentamos espacio entre líneas a 50px
+    total_height = len(lines) * 50
     y = (size[1] - total_height) // 2
     
     for line in lines:
@@ -61,6 +62,7 @@ def create_text_image(text, size=(800, 400)):
         y += 50
     
     return np.array(img)
+
 
 
 
