@@ -33,16 +33,15 @@ VOCES_DISPONIBLES = {
     'es-ES-Standard-C': texttospeech.SsmlVoiceGender.FEMALE
 }
 
-def create_text_image(text, size=(800, 400)):
+def create_text_image(text, size=(1280, 360), font_size=30, line_height=40):
     img = Image.new('RGB', size, 'black')
     draw = ImageDraw.Draw(img)
-    # Usamos DejaVu que tiene buen soporte para caracteres españoles
-    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 40)
-    
+    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", font_size)
+
     words = text.split()
     lines = []
     current_line = []
-    
+
     for word in words:
         current_line.append(word)
         test_line = ' '.join(current_line)
@@ -52,18 +51,17 @@ def create_text_image(text, size=(800, 400)):
             lines.append(' '.join(current_line))
             current_line = [word]
     lines.append(' '.join(current_line))
-    
-    total_height = len(lines) * 50
+
+    total_height = len(lines) * line_height
     y = (size[1] - total_height) // 2
-    
+
     for line in lines:
         left, top, right, bottom = draw.textbbox((0, 0), line, font=font)
         x = (size[0] - (right - left)) // 2
         draw.text((x, y), line, font=font, fill="white")
-        y += 50
-    
-    return np.array(img)
+        y += line_height
 
+    return np.array(img)
 def create_simple_video(texto, nombre_salida, voz):
     archivos_temp = []
     clips_audio = []
