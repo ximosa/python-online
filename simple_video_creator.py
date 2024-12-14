@@ -72,16 +72,16 @@ def create_simple_video(texto, nombre_salida, voz):
             clips_audio.append(audio_clip)
             duracion = audio_clip.duration
             
-            txt_clip = (TextClip(frase,
-                   fontsize=30,
-                   color='white',
-                   bg_color='black',
-                   size=(800, None),
-                   method='label',  # Cambiamos 'caption' por 'label'
-                   align='center')
-           .set_start(tiempo_acumulado)
-           .set_duration(duracion)
-           .set_position('center'))
+           txt_clip = (TextClip(frase,
+                       fontsize=30,
+                       color='white',
+                       bg_color='black',
+                       size=(800, None),
+                       method='pango',  # Cambiamos a método pango
+                       align='center')
+               .set_start(tiempo_acumulado)
+               .set_duration(duracion)
+               .set_position('center'))
 
             
             video_segment = txt_clip.set_audio(audio_clip.set_start(tiempo_acumulado))
