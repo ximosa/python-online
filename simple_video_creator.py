@@ -32,16 +32,38 @@ VOCES_DISPONIBLES = {
     'es-ES-Standard-C': texttospeech.SsmlVoiceGender.FEMALE
 }
 
-def create_text_image(text, size=(800, 200)):
+def create_text_image(text, size=(800, 400)):  # Aumentamos altura a 400
     img = Image.new('RGB', size, 'black')
     draw = ImageDraw.Draw(img)
-    # Aumentamos el tamaño usando una fuente TrueType
-    font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 50)
-    left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
-    text_width = right - left
-    text_height = bottom - top
-    draw.text(((size[0]-text_width)/2, (size[1]-text_height)/2), text, font=font, fill="white")
+    font = ImageFont.load_default()
+    
+    # Dividir el texto en líneas si es muy largo
+    words = text.split()
+    lines = []
+    current_line = []
+    
+    for word in words:
+        current_line.append(word)
+        test_line = ' '.join(current_line)
+        left, top, right, bottom = draw.textbbox((0, 0), test_line, font=font)
+        if right > size[0] - 40:  # Margen de 20px a cada lado
+            current_line.pop()
+            lines.append(' '.join(current_line))
+            current_line = [word]
+    lines.append(' '.join(current_line))
+    
+    # Dibujar líneas de texto
+    total_height = len(lines) * 30  # 30px por línea
+    y = (size[1] - total_height) // 2
+    
+    for line in lines:
+        left, top, right, bottom = draw.textbbox((0, 0), line, font=font)
+        x = (size[0] - (right - left)) // 2
+        draw.text((x, y), line, font=font, fill="white")
+        y += 30
+    
     return np.array(img)
+
 
 
 
