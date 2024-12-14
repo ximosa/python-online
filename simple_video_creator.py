@@ -32,12 +32,11 @@ VOCES_DISPONIBLES = {
     'es-ES-Standard-C': texttospeech.SsmlVoiceGender.FEMALE
 }
 
-def create_text_image(text, size=(800, 400)):  # Aumentamos altura a 400
+def create_text_image(text, size=(800, 400)):
     img = Image.new('RGB', size, 'black')
     draw = ImageDraw.Draw(img)
-    font = ImageFont.load_default()
+    font = ImageFont.load_default().font_variant(size=40)  # Aumentamos tamaño a 40
     
-    # Dividir el texto en líneas si es muy largo
     words = text.split()
     lines = []
     current_line = []
@@ -46,23 +45,23 @@ def create_text_image(text, size=(800, 400)):  # Aumentamos altura a 400
         current_line.append(word)
         test_line = ' '.join(current_line)
         left, top, right, bottom = draw.textbbox((0, 0), test_line, font=font)
-        if right > size[0] - 40:  # Margen de 20px a cada lado
+        if right > size[0] - 60:  # Más margen lateral
             current_line.pop()
             lines.append(' '.join(current_line))
             current_line = [word]
     lines.append(' '.join(current_line))
     
-    # Dibujar líneas de texto
-    total_height = len(lines) * 30  # 30px por línea
+    total_height = len(lines) * 50  # Aumentamos espacio entre líneas a 50px
     y = (size[1] - total_height) // 2
     
     for line in lines:
         left, top, right, bottom = draw.textbbox((0, 0), line, font=font)
         x = (size[0] - (right - left)) // 2
         draw.text((x, y), line, font=font, fill="white")
-        y += 30
+        y += 50
     
     return np.array(img)
+
 
 
 
