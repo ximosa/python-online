@@ -1,4 +1,6 @@
 imagemagick
 libmagickwand-dev
 ghostscript
+libpango1.0-0
+
 
